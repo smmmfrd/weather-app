@@ -2,6 +2,25 @@
     margin: 0;
 }
 
+html{
+    height: 100%;
+}
+
 body{
+    height: 100%;
     background-color: firebrick;
+}
+
+#content{
+    height: 100%;
+    padding: 1rem;
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 3rem;
+}
+
+#display{
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
 }
