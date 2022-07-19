@@ -1,15 +1,7 @@
-function importAllImages(r) {
-    let images = {};
-    r.keys().map((item, index) => { images[item.replace('./', '')] = r(item); });
-    return images;
-}
-
 import './index.css';
 
 const weekday = ["Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"];
 const months = ["January","February","March","April","May","June","July","August","September","October","November","December"];
- 
-const images = importAllImages(require.context('./images', false, /\.(png|jpe?g|svg)$/));
 const content = document.querySelector('#content');
 
 var usingCelsius = true;
@@ -106,8 +98,8 @@ function buildPage(data){
     display.appendChild(temp);
 
     let weatherIcon = document.createElement('img');
-    weatherIcon.style = "height: 250px; width: 250px;";
-    weatherIcon.src = images['day-sunny.svg'];
+    weatherIcon.style = "height: 200px; width: 200px;";
+    weatherIcon.src = `http://openweathermap.org/img/wn/${data.weather[0].icon}@4x.png`;
     display.appendChild(weatherIcon);
 
     content.appendChild(display);
