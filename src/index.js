@@ -12,6 +12,8 @@ const months = ["January","February","March","April","May","June","July","August
 const images = importAllImages(require.context('./images', false, /\.(png|jpe?g|svg)$/));
 const content = document.querySelector('#content');
 
+var usingCelsius = true;
+
 async function getWeather(location){
     var response = await fetch(`https://api.openweathermap.org/data/2.5/weather?q=${location}&APPID=4cdf9b1699a7b1a192527fe2c3641e33`);
 
@@ -40,7 +42,8 @@ function buildExtra(name, value){
 }
 
 function convertTemp(temp){
-    return (temp - 273.15).toFixed(1);
+    var convertedToCelsius = temp - 273.15;
+    return (usingCelsius ? convertedToCelsius : convertedToCelsius * 1.8 + 32).toFixed(1);
 }
 
 function buildPage(data){
@@ -71,6 +74,14 @@ function buildPage(data){
     errorDisplay.style.display = 'none';
     input.appendChild(errorDisplay);
 
+    let conversionButton = document.createElement('button');
+    conversionButton.textContent = `Display in ${usingCelsius ? 'F' : 'C'}`
+    conversionButton.addEventListener('click', () => {
+        usingCelsius = !usingCelsius;
+        buildPage(data);
+    });
+    input.appendChild(conversionButton);
+
     content.appendChild(input);
 
     // Display
@@ -91,7 +102,7 @@ function buildPage(data){
     display.appendChild(date);
 
     let temp = document.createElement('h1');
-    temp.innerHTML = `${convertTemp(data.main.temp)} °C`;
+    temp.innerHTML = `${convertTemp(data.main.temp)} °${usingCelsius ? 'C' : 'F'}`;
     display.appendChild(temp);
 
     let weatherIcon = document.createElement('img');
@@ -105,7 +116,7 @@ function buildPage(data){
     let extras = document.createElement('div');
     extras.id = 'extras';
 
-    let feelsLike = buildExtra('Feels Like', `${convertTemp(data.main.feels_like)} °C`);
+    let feelsLike = buildExtra('Feels Like', `${convertTemp(data.main.feels_like)} °${usingCelsius ? 'C' : 'F'}`);
     extras.appendChild(feelsLike);
 
     let humidity = buildExtra('Humidity', `${data.main.humidity}%`);
