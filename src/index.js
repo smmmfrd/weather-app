@@ -12,10 +12,10 @@ const months = ["January","February","March","April","May","June","July","August
 const images = importAllImages(require.context('./images', false, /\.(png|jpe?g|svg)$/));
 const content = document.querySelector('#content');
 
-async function getWeather(){
-    var response = await fetch('https://api.openweathermap.org/data/2.5/weather?q=London,uk&APPID=4cdf9b1699a7b1a192527fe2c3641e33');
+async function getWeather(location){
+    var response = await fetch(`https://api.openweathermap.org/data/2.5/weather?q=${location}&APPID=4cdf9b1699a7b1a192527fe2c3641e33`);
     var data = await response.json();
-    console.log(data);
+    buildPage(data);
 }
 
 function buildExtra(name, value){
@@ -32,7 +32,11 @@ function buildExtra(name, value){
     return div;
 }
 
-function buildPage(){
+function convertTemp(temp){
+    return (temp - 273.15).toFixed(1);
+}
+
+function buildPage(data){
     // Input
     let input = document.createElement('div');
     input.id = 'input';
@@ -48,11 +52,11 @@ function buildPage(){
     display.id = 'display';
 
     let weatherType = document.createElement('h2');
-    weatherType.textContent = 'Sunny';
+    weatherType.textContent = `${data.weather[0].main}`;
     display.appendChild(weatherType);
 
     let location = document.createElement('h3');
-    location.textContent = 'London, UK';
+    location.textContent = data.name;
     display.appendChild(location);
 
     let date = document.createElement('p');
@@ -61,7 +65,7 @@ function buildPage(){
     display.appendChild(date);
 
     let temp = document.createElement('h1');
-    temp.innerHTML = `Temp °F`;
+    temp.innerHTML = `${convertTemp(data.main.temp)} °C`;
     display.appendChild(temp);
 
     let weatherIcon = document.createElement('img');
@@ -73,20 +77,20 @@ function buildPage(){
 
     // Extras
     let extras = document.createElement('div');
-    extras.id = 'display';
+    extras.id = 'extras';
 
-    let feelsLike = buildExtra('Feels Like', `Temp °F`);
+    let feelsLike = buildExtra('Feels Like', `${convertTemp(data.main.feels_like)} °C`);
     extras.appendChild(feelsLike);
 
-    let humidity = buildExtra('Humidity', `100%`);
+    let humidity = buildExtra('Humidity', `${data.main.humidity}%`);
     extras.appendChild(humidity);
 
-    let wind = buildExtra('Wind Speed', `5 mph`);
+    let wind = buildExtra('Wind Speed', `${data.wind.speed} mph`);
     extras.appendChild(wind);
 
     content.appendChild(extras);
 }
-buildPage();
-// getWeather().catch(err => {
-//     console.log(err);
-// });
+
+getWeather('riverside, ca').catch(err => {
+    console.log(err);
+});
