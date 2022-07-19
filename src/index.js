@@ -14,8 +14,15 @@ const content = document.querySelector('#content');
 
 async function getWeather(location){
     var response = await fetch(`https://api.openweathermap.org/data/2.5/weather?q=${location}&APPID=4cdf9b1699a7b1a192527fe2c3641e33`);
-    var data = await response.json();
-    buildPage(data);
+
+    if(response.status === 404){
+        displayError(true);
+    } else {
+        var data = await response.json();
+        buildPage(data);
+        displayError(false);
+    }
+    
 }
 
 function buildExtra(name, value){
@@ -37,13 +44,32 @@ function convertTemp(temp){
 }
 
 function buildPage(data){
+    while(content.firstChild){
+        content.removeChild(content.firstChild);
+    }
+
     // Input
     let input = document.createElement('div');
     input.id = 'input';
 
     let textBox = document.createElement('input');
     textBox.type = 'text';
+
+    textBox.addEventListener('keydown', (event) =>{
+        if(event.key === 'Enter'){
+            if(textBox.value.length > 2){
+                getWeather(textBox.value);
+            }
+        }
+    });
+
     input.appendChild(textBox);
+
+    let errorDisplay = document.createElement('p');
+    errorDisplay.id = 'error-display';
+    errorDisplay.textContent = 'Location not found. Please enter a valid "City", "City, State", or "City, Country"';
+    errorDisplay.style.display = 'none';
+    input.appendChild(errorDisplay);
 
     content.appendChild(input);
 
@@ -91,6 +117,8 @@ function buildPage(data){
     content.appendChild(extras);
 }
 
-getWeather('riverside, ca').catch(err => {
-    console.log(err);
-});
+function displayError(show){
+    document.getElementById('error-display').style.display = show ? 'block' : 'none';
+}
+
+getWeather('riverside, ca');
